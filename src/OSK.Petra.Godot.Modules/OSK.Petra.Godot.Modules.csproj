@@ -1,0 +1,18 @@
+﻿<Project Sdk="Godot.NET.Sdk/4.0.0">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+
+		<Description>A standard game module implementation utilizing the Petra suite and framework, for use within Godot. </Description>
+		<PackageTags>OpenSourceKingdom, OpenSource, Petra, Game, Framework, Suite, Tool, Module, Godot</PackageTags>
+		<Title>OSK.Petra.Godot.Configuration</Title>
+		<Authors>BlankDev117</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/OpenSourceKingdom/OSK.Petra.Godot.Modules</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+</Project>
