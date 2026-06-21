@@ -1,17 +1,15 @@
 ﻿using Godot;
-using OSK.Extensions.Petra.Godot.DependencyInjection;
 using OSK.Petra.DependencyInjection.Ports;
-using OSK.Petra.Modules.Bootstrapper;
-using OSK.Petra.Modules.Bootstrapper.Ports;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using OSK.Petra.Godot.Modules.Services.Ports;
+using OSK.Petra.Modules.Services;
+using OSK.Petra.Modules.Services.Ports;
+using OSK.Extensions.Petra.Godot.DependencyInjection;
 
 namespace OSK.Petra.Godot.Modules.Services.Internal.Services;
 
 
-public partial class GodotServiceConfigurator: ModuleServiceBuilder, IGodotServiceConfigurator
+internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuilder
 {
     #region Variables
 
@@ -22,11 +20,11 @@ public partial class GodotServiceConfigurator: ModuleServiceBuilder, IGodotServi
     #region Constructors
 
     /// <summary>
-    /// Creates a <see cref="GodotServiceConfigurator"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
+    /// Creates a <see cref="GameServiceBuilder"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
     /// </summary>
     /// <param name="rootNode">The node treated as the root during scene initialization</param>
     /// <param name="serviceProvider">An initializing service provider</param>
-    public GodotServiceConfigurator(Node rootNode, IGameServiceProvider? serviceProvider = null)
+    public GameServiceBuilder(Node rootNode, IGameServiceProvider? serviceProvider = null)
         : base(serviceProvider)
     {
         if (rootNode is null)
@@ -38,12 +36,12 @@ public partial class GodotServiceConfigurator: ModuleServiceBuilder, IGodotServi
     }
 
     /// <summary>
-    /// Creates a <see cref="GodotServiceConfigurator"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
+    /// Creates a <see cref="GameServiceBuilder"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
     /// </summary>
     /// <param name="rootNode">The node treated as the root during scene initialization</param>
     /// <param name="configurationProvider">The configuration provider to use to retrieve the app configuration with the scene initialization</param>
     /// <param name="serviceProvider">An initializing service provider</param>
-    public GodotServiceConfigurator(Node rootNode, IConfigurationProvider configurationProvider, IGameServiceProvider? serviceProvider = null)
+    public GameServiceBuilder(Node rootNode, IConfigurationProvider configurationProvider, IGameServiceProvider? serviceProvider = null)
         : base(configurationProvider, serviceProvider)
     {
         if (rootNode is null)
@@ -56,10 +54,10 @@ public partial class GodotServiceConfigurator: ModuleServiceBuilder, IGodotServi
 
     #endregion
 
-    #region IGodotServiceConfigurator
+    #region IGameServiceBuilder
 
     /// <inheritdoc/>
-    public IGodotServiceConfigurator AddNode<TNode>()
+    public IGameModuleServiceBuilder AddNode<TNode>()
         where TNode : Node
     {
         Services.AddSingletonNode<TNode>(_rootNode);
@@ -67,7 +65,7 @@ public partial class GodotServiceConfigurator: ModuleServiceBuilder, IGodotServi
     }
 
     /// <inheritdoc/>
-    public IGodotServiceConfigurator AddNode<TInterface, TNode>()
+    public IGameModuleServiceBuilder AddNode<TInterface, TNode>()
         where TInterface : class
         where TNode : Node, TInterface
     {

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.0.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.1.0">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
@@ -14,5 +14,9 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="OSK.Petra.Modules" Version="0.1.0" />
+	</ItemGroup>
 
 </Project>

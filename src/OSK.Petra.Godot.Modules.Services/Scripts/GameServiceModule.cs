@@ -1,22 +1,24 @@
 ﻿using Godot;
 using OSK.Petra.DependencyInjection;
 using OSK.Petra.DependencyInjection.Ports;
-using OSK.Petra.Godot.Configuration;
-using OSK.Petra.Modules.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using TowerDefenseLabs.Libraries.OSK.Godot.AssetManagement.Scripts;
-using OSK.Petra.Godot.Modules.Services.Ports;
+using OSK.Petra.Modules.Services;
+using OSK.Petra.Godot.Modules.Scripts;
+using OSK.Petra.Modules;
+using OSK.Petra.Godot.Modules.Services.Internal.Services;
 
 namespace OSK.Petra.Godot.Modules.Services.Scripts;
 
-public abstract partial class GameServiceModule: GodotModule, IServiceModule
+/// <summary>
+/// A base service module for Godot. Implementations are only required to provide a <see cref="ModuleName"/>, but overriding the initialization logic should be achievable
+/// </summary>
+[GlobalClass]
+public abstract partial class GameServiceModule: GameModule, IServiceModule
 {
     #region IGameServiceModule
 
     /// <inheritdoc/>
-    public IGameServiceProvider Services { get; private set; }
+    public IGameServiceProvider Services { get; protected set; } = new EmptyGameServiceProvider();
 
     /// <inheritdoc/>
     public void Initialize(IGameServiceProvider serviceProvider)
@@ -27,6 +29,8 @@ public abstract partial class GameServiceModule: GodotModule, IServiceModule
         }
 
         Services = serviceProvider;
+
+        InitializeNode(this, Services);
     }
 
     #endregion
@@ -42,8 +46,6 @@ public abstract partial class GameServiceModule: GodotModule, IServiceModule
 
         DependencyInjector.InjectDependencies(serviceProvider, node);
     }
-
-    protected abstract void Configure(IGodotServiceConfigurator configurator);
 
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.0.0">
+﻿<Project Sdk="Godot.NET.Sdk/4.1.0">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
@@ -22,6 +22,7 @@
 	<ItemGroup>
 		<PackageReference Include="OSK.Extensions.Petra.Godot" Version="0.3.0" />
 		<PackageReference Include="OSK.Extensions.Petra.Godot.DependencyInjection" Version="0.3.0" />
+		<PackageReference Include="OSK.Petra.Modules.Services" Version="0.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>
