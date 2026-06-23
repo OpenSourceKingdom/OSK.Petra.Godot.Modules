@@ -4,7 +4,6 @@ using System;
 using OSK.Petra.Godot.Modules.Services.Ports;
 using OSK.Petra.Modules.Services;
 using OSK.Petra.Modules.Services.Ports;
-using OSK.Extensions.Petra.Godot.DependencyInjection;
 
 namespace OSK.Petra.Godot.Modules.Services.Internal.Services;
 
@@ -60,7 +59,7 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
     public IGameModuleServiceBuilder AddNode<TNode>()
         where TNode : Node
     {
-        Services.AddSingletonNode<TNode>(_rootNode);
+        //Services.AddSingletonNode<TNode>(_rootNode);
         return this;
     }
 
@@ -69,7 +68,7 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
         where TInterface : class
         where TNode : Node, TInterface
     {
-        Services.AddSingletonNode<TInterface, TNode>(_rootNode);
+       // Services.AddSingletonNode<TInterface, TNode>(_rootNode);
         return this;
     }
 

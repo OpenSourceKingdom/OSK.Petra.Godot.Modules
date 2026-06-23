@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="OSK.Petra.Godot.Modules.Services.UnitTests/OSK.Petra.Godot.Modules.Services.UnitTests.csproj" Id="eabfeb26-d7dd-4d79-b125-22695459684c" />
   <Project Path="OSK.Petra.Godot.Modules.Services/OSK.Petra.Godot.Modules.Services.csproj" Id="b7bfaac4-5991-4433-99f7-7c44167f5d84" />
   <Project Path="OSK.Petra.Godot.Modules/OSK.Petra.Godot.Modules.csproj" />
 </Solution>
