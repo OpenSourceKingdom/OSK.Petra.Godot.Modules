@@ -1,14 +1,11 @@
 using Godot;
-using GdUnit4.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using OSK.Petra.DependencyInjection.Ports;
 using OSK.Petra.Godot.Modules.Services.Internal.Services;
-using OSK.Petra.Godot.Modules.Services.Ports;
-using OSK.Petra.Godot.Modules.Services.UnitTests._Helpers;
-using OSK.Petra.Modules.Services;
 using GdUnit4;
 using TestNode = OSK.Petra.Godot.Modules.Services.UnitTests._Helpers.TestNode;
+using OSK.Petra.Godot.Modules.Services.UnitTests._Helpers;
 
 namespace OSK.Petra.Godot.Modules.Services.UnitTests.Internal.Services;
 
@@ -49,24 +46,25 @@ public class GameServiceBuilderTests
     public void AddNode_TNode_RegistersSingletonNode()
     {
         // Arrange
-        var node = new Node();
+        var rootNode = new Node();
+        var childNode = new TestNode();
+
+        rootNode.AddChild(childNode);
+
+        var services = new ServiceCollection();
 
         var mockServiceProvider = new Mock<IGameServiceProvider>();
         mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(new ServiceCollection());
-        var builder = new GameServiceBuilder(node, mockServiceProvider.Object);
-
-        var serviceCollection = new ServiceCollection();
-        mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(serviceCollection);
+            .Returns(services);
+        var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
-        builder.AddNode<Node>();
+        builder.AddNode<TestNode>();
 
         // Assert
+        Assert.Single(services);
 
-
-        node.Free();
+        rootNode.Free();
     }
 
     [TestCase]
@@ -74,15 +72,25 @@ public class GameServiceBuilderTests
     public void AddNode_TInterface_TNode_RegistersSingletonNodeWithInterface()
     {
         // Arrange
+        var rootNode = new Node();
+        var childNode = new TestNode();
+
+        rootNode.AddChild(childNode);
+
+        var services = new ServiceCollection();
+
         var mockServiceProvider = new Mock<IGameServiceProvider>();
         mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(new ServiceCollection());
-        var builder = new GameServiceBuilder(new Node(), mockServiceProvider.Object);
+            .Returns(services);
+        var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
         builder.AddNode<ITestInterface, TestNode>();
 
         // Assert
+        Assert.Single(services);
+
+        rootNode.Free();
     }
 
     [TestCase]
@@ -90,16 +98,22 @@ public class GameServiceBuilderTests
     public void AddNode_ReturnsSameBuilderForChaining()
     {
         // Arrange
+        var rootNode = new Node();
+        var childNode = new TestNode();
+
+        rootNode.AddChild(childNode);
+
         var mockServiceProvider = new Mock<IGameServiceProvider>();
         mockServiceProvider.Setup(s => s.CreateScopedServices())
             .Returns(new ServiceCollection());
-        var builder = new GameServiceBuilder(new Node(), mockServiceProvider.Object);
+        var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
         var result = builder.AddNode<TestNode>();
 
         // Assert
         Assert.Same(builder, result);
+        rootNode.Free();
     }
 
     [TestCase]
@@ -107,21 +121,23 @@ public class GameServiceBuilderTests
     public void AddNode_TInterface_TNode_ReturnsSameBuilderForChaining()
     {
         // Arrange
+        var rootNode = new Node();
+        var childNode = new TestNode();
+
+        rootNode.AddChild(childNode);
+
         var mockServiceProvider = new Mock<IGameServiceProvider>();
         mockServiceProvider.Setup(s => s.CreateScopedServices())
             .Returns(new ServiceCollection());
-        var builder = new GameServiceBuilder(new Node(), mockServiceProvider.Object);
+        var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
         var result = builder.AddNode<ITestInterface, TestNode>();
 
         // Assert
         Assert.Same(builder, result);
+        rootNode.Free();
     }
 
     #endregion
-}
-
-public interface ITestInterface
-{
 }

@@ -4,6 +4,7 @@ using System;
 using OSK.Petra.Godot.Modules.Services.Ports;
 using OSK.Petra.Modules.Services;
 using OSK.Petra.Modules.Services.Ports;
+using OSK.Extensions.Petra.Godot.DependencyInjection;
 
 namespace OSK.Petra.Godot.Modules.Services.Internal.Services;
 
@@ -40,7 +41,7 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
     /// <param name="rootNode">The node treated as the root during scene initialization</param>
     /// <param name="configurationProvider">The configuration provider to use to retrieve the app configuration with the scene initialization</param>
     /// <param name="serviceProvider">An initializing service provider</param>
-    public GameServiceBuilder(Node rootNode, IConfigurationProvider configurationProvider, IGameServiceProvider? serviceProvider = null)
+    public GameServiceBuilder(Node rootNode, IModuleConfigurationProvider configurationProvider, IGameServiceProvider? serviceProvider = null)
         : base(configurationProvider, serviceProvider)
     {
         if (rootNode is null)
@@ -59,7 +60,7 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
     public IGameModuleServiceBuilder AddNode<TNode>()
         where TNode : Node
     {
-        //Services.AddSingletonNode<TNode>(_rootNode);
+        Services.AddSingletonNode<TNode>(_rootNode);
         return this;
     }
 
@@ -68,7 +69,7 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
         where TInterface : class
         where TNode : Node, TInterface
     {
-       // Services.AddSingletonNode<TInterface, TNode>(_rootNode);
+        Services.AddSingletonNode<TInterface, TNode>(_rootNode);
         return this;
     }
 

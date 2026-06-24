@@ -1,10 +1,8 @@
 using GdUnit4;
 using Godot;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using OSK.Petra.DependencyInjection.Ports;
-using OSK.Petra.Godot.Modules.Services.Internal.Services;
 using OSK.Petra.Godot.Modules.Services.Ports;
 using OSK.Petra.Godot.Modules.Services.Scripts;
 using OSK.Petra.Godot.Modules.Services.UnitTests._Helpers;
@@ -20,7 +18,6 @@ public class GameModuleBootstrapperTests
 
     private readonly Mock<IServiceModule> _mockServiceModule = new();
     private readonly Mock<IGameServiceProvider> _mockServiceProvider = new();
-    private readonly Mock<IGameServiceConfigurator> _mockConfigurator = new();
 
     #endregion
 
@@ -39,22 +36,6 @@ public class GameModuleBootstrapperTests
 
     #endregion
 
-    #region _Setup
-
-    [Before]
-    public void Test()
-    {
-
-    }
-
-    [BeforeTest]
-    public void TestTwo()
-    {
-
-    }
-
-    #endregion
-
     #region Initialize
 
     [TestCase]
@@ -62,23 +43,33 @@ public class GameModuleBootstrapperTests
     public void Initialize_NullRoot_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(null!, _mockServiceModule.Object, Array.Empty<IGameServiceConfigurator>(), null));
+        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(null!, Mock.Of<IServiceModule>(), [], null));
     }
 
     [TestCase]
     [RequireGodotRuntime]
     public void Initialize_NullServiceModule_ThrowsArgumentNullException()
     {
-        // Arrange/Act/Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(new Node(), null!, [], null));
+        // Arrange
+        var node = new Node();
+
+        // Act/Assert
+        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(node, null!, [], null));
+
+        node.Free();
     }
 
     [TestCase]
     [RequireGodotRuntime]
     public void Initialize_NullConfigurators_ThrowsArgumentNullException()
     {
-        // Arrange/Act/Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(new Node(), _mockServiceModule.Object, null!, null));
+        // Arrange
+        var node = new Node();
+
+        // Act/Assert
+        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(node, Mock.Of<IServiceModule>(), null!, null));
+
+        node.Free();
     }
 
     [TestCase]
@@ -86,27 +77,21 @@ public class GameModuleBootstrapperTests
     public void Initialize_ValidInputs_CallsConfigureOnAllConfigurators()
     {
         // Arrange
+        var node = new Node();
         var configurator1 = new TestServiceConfigurator();
         var configurator2 = new TestServiceConfigurator();
         var configurators = new[] { configurator1, configurator2 };
 
         // Act
-        GameModuleBootstrapper.Initialize(new Node(), _mockServiceModule.Object, configurators, null, null);
+        GameModuleBootstrapper.Initialize(node, _mockServiceModule.Object, configurators, null, null);
 
         // Assert
         Assert.True(configurator1.ConfigureWasCalled);
         Assert.True(configurator2.ConfigureWasCalled);
-    }
 
-    [TestCase]
-    [RequireGodotRuntime]
-    public void Initialize_ValidInputs_CallsModuleInitialize()
-    {
-        // Act
-        GameModuleBootstrapper.Initialize(new Node(), _mockServiceModule.Object, Array.Empty<IGameServiceConfigurator>(), null, null);
-
-        // Assert
         _mockServiceModule.Verify(m => m.Initialize(It.IsAny<IGameServiceProvider>()), Times.Once);
+
+        node.Free();
     }
 
     [TestCase]
@@ -114,6 +99,26 @@ public class GameModuleBootstrapperTests
     [GodotExceptionMonitor]
     public void Initialize_Generic_NotIServiceModule_ReturnsEarly()
     {
+        // Arrange
+        var nonServiceModule = new NonServiceModuleNode();
+
+        var mockParentModule = new Mock<IServiceModule>();
+        var mockConfigurationProvider = new Mock<IModuleConfigurationProvider>();
+        var mockConfigurator = new Mock<IGameServiceConfigurator>();
+
+        // Act
+        GameModuleBootstrapper.Initialize(nonServiceModule, mockParentModule.Object);
+        GameModuleBootstrapper.Initialize(nonServiceModule, mockConfigurationProvider.Object);
+        GameModuleBootstrapper.Initialize(nonServiceModule, [mockConfigurator.Object], null);
+
+        // Assert
+
+        // nothing should have triggered since it bailed early
+        mockParentModule.VerifyGet(m => m.Services, Times.Never);
+        mockConfigurationProvider.Verify(m => m.GetConfiguration(), Times.Never);
+        mockConfigurator.Verify(m => m.Configure(It.IsAny<IGameModuleServiceBuilder>()), Times.Never);
+
+        nonServiceModule.Free();
     }
 
     [TestCase]
@@ -121,17 +126,18 @@ public class GameModuleBootstrapperTests
     public void Initialize_WithConfigurationProvider_UseProvidedProvider()
     {
         // Arrange
+        var node = new TestableGameServiceModule();
         var testConfigProvider = new TestConfigurationProvider();
 
         // Act
-        GameModuleBootstrapper.Initialize(
-            new Node(),
-            (IGameServiceConfigurator[])[],
-            testConfigProvider,
-            null);
+        GameModuleBootstrapper.Initialize(node, [], testConfigProvider, null);
 
         // Assert
         Assert.True(testConfigProvider.GetConfigurationWasCalled);
+
+        _mockServiceModule.Verify(m => m.Initialize(It.IsAny<IGameServiceProvider>()), Times.Once);
+        
+        node.Free();
     }
 
     [TestCase]
@@ -139,18 +145,16 @@ public class GameModuleBootstrapperTests
     public void Initialize_ModuleIsConfigurationProvider_UseModuleProvider()
     {
         // Arrange
-        var mockModule = new Mock<TestableGameServiceModule>();
-        mockModule.Setup(m => m.Services).Returns(_mockServiceProvider.Object);
+        var node = new Node();
+        var mockModule = new Mock<IServiceModule>();
+        mockModule.SetupGet(m => m.Services)
+            .Returns(_mockServiceProvider.Object);
 
-        // Act - pass no explicit provider, module itself is IConfigurationProvider
-        GameModuleBootstrapper.Initialize(
-            new Node(),
-            mockModule.Object,
-            Array.Empty<IGameServiceConfigurator>(),
-            null);
+        // Act
+        GameModuleBootstrapper.Initialize(node, mockModule.Object, [], null);
 
         // Assert
-        _mockServiceModule.Verify(m => m.Initialize(It.IsAny<IGameServiceProvider>()), Times.Once);
+        node.Free();
     }
 
     [TestCase]
@@ -158,19 +162,18 @@ public class GameModuleBootstrapperTests
     public void Initialize_ParentIsConfigurationProvider_FallBackToParent()
     {
         // Arrange
+        var node = new Node();
         var parentConfigProvider = new TestConfigurationProvider();
-        var mockChildModule = new Mock<GameServiceModule>();
-        mockChildModule.Setup(m => m.Services).Returns(_mockServiceProvider.Object);
+        var mockChildModule = new Mock<IServiceModule>();
+        mockChildModule.Setup(m => m.Services)
+            .Returns(_mockServiceProvider.Object);
 
-        // Act - pass parent that is IConfigurationProvider
-        GameModuleBootstrapper.Initialize(
-            new Node(),
-            mockChildModule.Object,
-            Array.Empty<IGameServiceConfigurator>(),
-            parentConfigProvider);
+        // Act
+        GameModuleBootstrapper.Initialize(node, mockChildModule.Object, [], parentConfigProvider);
 
         // Assert
         Assert.True(parentConfigProvider.GetConfigurationWasCalled);
+        node.Free();
     }
 
     [TestCase]
@@ -178,19 +181,18 @@ public class GameModuleBootstrapperTests
     public void Initialize_ModuleHasConfigurator_AddsFromConfigurator()
     {
         // Arrange
+        var node = new Node();
         var configurator = new TestServiceConfigurator();
-        var mockModule = new Mock<TestableGameServiceModule>();
-        mockModule.Setup(m => m.Services).Returns(_mockServiceProvider.Object);
+        var mockModule = new Mock<IServiceModule>();
+        mockModule.SetupGet(m => m.Services)
+            .Returns(_mockServiceProvider.Object);
 
-        // Act - module implements IGameServiceConfigurator via TestableGameServiceModule
-        GameModuleBootstrapper.Initialize(
-            new Node(),
-            mockModule.Object,
-            new[] { configurator },
-            null);
+        // Act
+        GameModuleBootstrapper.Initialize(node, mockModule.Object, [ configurator ], null);
 
         // Assert
         Assert.True(configurator.ConfigureWasCalled);
+        node.Free();
     }
 
     #endregion
