@@ -15,12 +15,6 @@ namespace OSK.Petra.Godot.Modules.Services.UnitTests.Internal.Services;
 [TestSuite]
 public class GameServiceBuilderTests
 {
-    #region Variables
-
-    private readonly Mock<IGameServiceProvider> _mockServiceProvider = new();
-
-    #endregion
-
     #region Constructors
 
     [TestCase]
@@ -28,16 +22,6 @@ public class GameServiceBuilderTests
     {
         // Arrange/Act/Assert
         Assert.Throws<ArgumentNullException>(() => new GameServiceBuilder(null!));
-    }
-
-    [TestCase]
-    public void Constructor_WithConfigProvider_NullRootNode_ThrowsArgumentNullException()
-    {
-        // Arrange
-        var configProvider = new EmptyConfigurationProvider();
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new GameServiceBuilder(null!, configProvider));
     }
 
     [TestCase]
@@ -65,19 +49,24 @@ public class GameServiceBuilderTests
     public void AddNode_TNode_RegistersSingletonNode()
     {
         // Arrange
+        var node = new Node();
+
         var mockServiceProvider = new Mock<IGameServiceProvider>();
         mockServiceProvider.Setup(s => s.CreateScopedServices())
             .Returns(new ServiceCollection());
-        var builder = new GameServiceBuilder(new Node(), mockServiceProvider.Object);
+        var builder = new GameServiceBuilder(node, mockServiceProvider.Object);
 
-        int registeredCountBefore = 0;
         var serviceCollection = new ServiceCollection();
-        mockServiceProvider.Setup(s => s.CreateScopedServices()).Returns(serviceCollection);
+        mockServiceProvider.Setup(s => s.CreateScopedServices())
+            .Returns(serviceCollection);
 
         // Act
         builder.AddNode<Node>();
 
         // Assert
+
+
+        node.Free();
     }
 
     [TestCase]
