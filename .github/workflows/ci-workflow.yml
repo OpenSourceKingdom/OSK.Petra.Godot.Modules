@@ -53,19 +53,5 @@ jobs:
       - name: Build
         run: dotnet build --no-restore ./src/${{ github.event.repository.name }}.slnx
 
-      - name: "Run Tests"
-        if: ${{ !cancelled() }}
-        shell: bash
-        run: |
-          chmod +x ./tests/tools/runtests.sh
-          xvfb-run --auto-servernum ./tests/tools/runtests.sh
-
-      - name: "Upload Test Reports"
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
-        with:
-          retention-days: 10
-          name: example_report
-          path: |
-            ./TestResults/*.trx
-            ./TestResults/*.html
+      - name: Test
+        run: dotnet test --no-build --verbosity normal ./src/${{ github.event.repository.name }}.slnx
