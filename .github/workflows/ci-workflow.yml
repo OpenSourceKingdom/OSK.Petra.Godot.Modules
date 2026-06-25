@@ -38,12 +38,6 @@ jobs:
           name: godot
           export-templates: true
 
-      - name: Print Godot Path
-        run: |
-          which godot
-          godot --version
-          env | sort
-
       - name: Setup GODOT_BIN
         run: echo "GODOT_BIN=$(which godot)" >> $GITHUB_ENV
 
@@ -54,4 +48,4 @@ jobs:
         run: dotnet build --no-restore ./src/${{ github.event.repository.name }}.slnx
 
       - name: Test
-        run: dotnet test --no-build --settings .runsettings-ci --verbosity normal ./src/${{ github.event.repository.name }}.slnx
+        run: dotnet test --no-build --settings ./src/runsettings --verbosity normal ./src/${{ github.event.repository.name }}.slnx
