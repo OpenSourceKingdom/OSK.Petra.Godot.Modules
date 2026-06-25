@@ -57,8 +57,8 @@ jobs:
         if: ${{ !cancelled() }}
         shell: bash
         run: |
-          chmod +x ../../tests/tools/runtests.sh
-          xvfb-run --auto-servernum ../../tests/tools/runtests.sh
+          chmod +x ./tests/tools/runtests.sh
+          xvfb-run --auto-servernum ./tests/tools/runtests.sh
 
       - name: "Upload Test Reports"
         if: ${{ !cancelled() }}
