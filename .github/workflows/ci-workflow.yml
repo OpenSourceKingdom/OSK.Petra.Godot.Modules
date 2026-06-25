@@ -54,4 +54,4 @@ jobs:
         run: dotnet build --no-restore ./src/${{ github.event.repository.name }}.slnx
 
       - name: Test
-        run: dotnet test --headless --no-build --verbosity normal ./src/${{ github.event.repository.name }}.slnx
+        run: dotnet test --no-build --settings .runsettings-ci --verbosity normal ./src/${{ github.event.repository.name }}.slnx
