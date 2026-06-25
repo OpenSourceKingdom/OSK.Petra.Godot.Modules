@@ -1,0 +1,32 @@
+﻿<Project Sdk="Godot.NET.Sdk/4.1.0">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+
+		<Description>A game module implementation that utilizes .NET DI for the Petra game suite and framework, for use within Godot. </Description>
+		<PackageTags>OpenSourceKingdom, OpenSource, Petra, Game, Framework, Suite, Tool, Dependency, Inject, Injection, Container, Service, Provider, Module, Godot</PackageTags>
+		<Title>OSK.Petra.Godot.Configuration</Title>
+		<Authors>BlankDev117</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/OpenSourceKingdom/OSK.Petra.Godot.Modules</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OSK.Extensions.Petra.Godot.DependencyInjection" Version="0.3.0" />
+		<PackageReference Include="OSK.Petra.Modules.Services" Version="0.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\OSK.Petra.Godot.Modules\OSK.Petra.Godot.Modules.csproj" />
+	</ItemGroup>
+
+</Project>
