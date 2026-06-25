@@ -48,4 +48,4 @@ jobs:
         run: dotnet build --no-restore ./src/${{ github.event.repository.name }}.slnx
 
       - name: Test
-        run: dotnet test --no-build --settings ./src/runsettings --verbosity normal ./src/${{ github.event.repository.name }}.slnx
+        run: dotnet test --no-build --settings ./src/gdunit4.runsettings --verbosity normal ./src/${{ github.event.repository.name }}.slnx
