@@ -23,7 +23,7 @@ for project in $(find . -name "*Test*.csproj" -o -name "*.Test.csproj"); do
     echo "========================================="
 
     # Run the test and capture the exit code
-    dotnet test "$project" --no-build --settings .runsettings-ci --verbosity normal \
+    dotnet test "$project" --no-build --verbosity normal \
         --logger:"html;LogFileName=test-result-$project_name.html" \
         --logger:"trx;LogFileName=test-result-$project_name.trx"
 
