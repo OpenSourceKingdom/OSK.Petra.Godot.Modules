@@ -1,6 +1,7 @@
 ﻿using Godot;
 using OSK.Petra.Godot.Modules.Services.Internal.Services;
 using OSK.Petra.Godot.Modules.Services.Options;
+using OSK.Petra.Godot.Modules.Services.Ports;
 using OSK.Petra.Godot.Modules.Services.Scripts;
 using OSK.Petra.Modules.Services;
 using OSK.Petra.Modules.Services.Ports;
@@ -74,6 +75,11 @@ public static class GameModuleBootstrapper
         foreach (var serviceConfigurator in options.ServiceConfigurators)
         {
             serviceConfigurator.Configure(serviceBuilder);
+        }
+
+        if (serviceModule is IGameServiceConfigurator moduleConfigurator)
+        {
+            moduleConfigurator.Configure(serviceBuilder);
         }
 
         var services = serviceBuilder.BuildServiceProvider();
