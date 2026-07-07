@@ -1,10 +1,9 @@
 using GdUnit4;
 using Godot;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using OSK.Petra.DependencyInjection.Ports;
+using OSK.Petra.Godot.Modules.Services.Internal.Services;
 using OSK.Petra.Godot.Modules.Services.Ports;
-using OSK.Petra.Godot.Modules.Services.Scripts;
 using OSK.Petra.Godot.Modules.Services.UnitTests._Helpers;
 using OSK.Petra.Modules.Services;
 using OSK.Petra.Modules.Services.Ports;
@@ -43,7 +42,7 @@ public class GameModuleBootstrapperTests
     public void Initialize_NullRoot_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(null!, Mock.Of<IServiceModule>(), [], null));
+        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(null!, Mock.Of<IServiceModule>()));
     }
 
     [TestCase]
@@ -54,20 +53,7 @@ public class GameModuleBootstrapperTests
         var node = new Node();
 
         // Act/Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(node, null!, [], null));
-
-        node.Free();
-    }
-
-    [TestCase]
-    [RequireGodotRuntime]
-    public void Initialize_NullConfigurators_ThrowsArgumentNullException()
-    {
-        // Arrange
-        var node = new Node();
-
-        // Act/Assert
-        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(node, Mock.Of<IServiceModule>(), null!, null));
+        Assert.Throws<ArgumentNullException>(() => GameModuleBootstrapper.Initialize(node, null!, _ => { }));
 
         node.Free();
     }
@@ -83,7 +69,10 @@ public class GameModuleBootstrapperTests
         var configurators = new[] { configurator1, configurator2 };
 
         // Act
-        GameModuleBootstrapper.Initialize(node, _mockServiceModule.Object, configurators, null, null);
+        GameModuleBootstrapper.Initialize(node, _mockServiceModule.Object, options =>
+        {
+            options.WithServiceConfigurators(configurators);
+        });
 
         // Assert
         Assert.True(configurator1.ConfigureWasCalled);
@@ -108,8 +97,7 @@ public class GameModuleBootstrapperTests
 
         // Act
         GameModuleBootstrapper.Initialize(nonServiceModule, mockParentModule.Object);
-        GameModuleBootstrapper.Initialize(nonServiceModule, mockConfigurationProvider.Object);
-        GameModuleBootstrapper.Initialize(nonServiceModule, [mockConfigurator.Object], null);
+        GameModuleBootstrapper.Initialize(nonServiceModule, _ => { });
 
         // Assert
 
@@ -130,7 +118,7 @@ public class GameModuleBootstrapperTests
         var testConfigProvider = new TestConfigurationProvider();
 
         // Act
-        GameModuleBootstrapper.Initialize(node, [], testConfigProvider, null);
+        GameModuleBootstrapper.Initialize(node, options => { options.WithConfigurationProvider(testConfigProvider); });
 
         // Assert
         Assert.True(testConfigProvider.GetConfigurationWasCalled);
@@ -146,14 +134,18 @@ public class GameModuleBootstrapperTests
     {
         // Arrange
         var node = new Node();
-        var mockModule = new Mock<IServiceModule>();
+        var mockModule = new Mock<ITestModuleServiceConfigurator>();
         mockModule.SetupGet(m => m.Services)
             .Returns(_mockServiceProvider.Object);
+        mockModule.Setup(m => m.GetConfiguration())
+               .Returns(new EmptyConfigurationProvider().GetConfiguration());
 
         // Act
-        GameModuleBootstrapper.Initialize(node, mockModule.Object, [], null);
+        GameModuleBootstrapper.Initialize(node, mockModule.Object, _ => { });
 
         // Assert
+        mockModule.Verify(m => m.GetConfiguration(), Times.Once);
+
         node.Free();
     }
 
@@ -163,16 +155,16 @@ public class GameModuleBootstrapperTests
     {
         // Arrange
         var node = new Node();
-        var parentConfigProvider = new TestConfigurationProvider();
+        var parentConfigProvider = new TestGameModuleServiceConfigurator();
         var mockChildModule = new Mock<IServiceModule>();
         mockChildModule.Setup(m => m.Services)
             .Returns(_mockServiceProvider.Object);
 
         // Act
-        GameModuleBootstrapper.Initialize(node, mockChildModule.Object, [], parentConfigProvider);
+        GameModuleBootstrapper.Initialize(node, mockChildModule.Object, options => { options.WithParent(parentConfigProvider); });
 
         // Assert
-        Assert.True(parentConfigProvider.GetConfigurationWasCalled);
+        Assert.True(parentConfigProvider.ConfigurationWasCalled);
         node.Free();
     }
 
@@ -188,7 +180,7 @@ public class GameModuleBootstrapperTests
             .Returns(_mockServiceProvider.Object);
 
         // Act
-        GameModuleBootstrapper.Initialize(node, mockModule.Object, [ configurator ], null);
+        GameModuleBootstrapper.Initialize(node, mockModule.Object, options => { options.WithServiceConfigurators(configurator); });
 
         // Assert
         Assert.True(configurator.ConfigureWasCalled);

@@ -40,10 +40,4 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="gdunit4_testadapter_v5\GdUnit4TestRunnerScene.cs">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Compile>
-	</ItemGroup>
-
 </Project>
