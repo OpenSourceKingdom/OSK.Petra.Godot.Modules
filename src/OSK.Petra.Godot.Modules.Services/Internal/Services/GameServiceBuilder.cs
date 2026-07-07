@@ -9,7 +9,7 @@ using OSK.Extensions.Petra.Godot.DependencyInjection;
 namespace OSK.Petra.Godot.Modules.Services.Internal.Services;
 
 
-internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuilder
+internal class GameServiceBuilder : ModuleServiceBuilder, IGameModuleServiceBuilder
 {
     #region Variables
 
@@ -23,9 +23,40 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
     /// Creates a <see cref="GameServiceBuilder"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
     /// </summary>
     /// <param name="rootNode">The node treated as the root during scene initialization</param>
+    public GameServiceBuilder(Node rootNode)
+    {
+        if (rootNode is null)
+        {
+            throw new ArgumentNullException(nameof(rootNode));
+        }
+
+        _rootNode = rootNode;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="GameServiceBuilder"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
+    /// </summary>
+    /// <param name="rootNode">The node treated as the root during scene initialization</param>
     /// <param name="serviceProvider">An initializing service provider</param>
-    public GameServiceBuilder(Node rootNode, IGameServiceProvider? serviceProvider = null)
-        : base(serviceProvider)
+    /// <param name="useAsPrimaryProvider">Whether the provider should be considered the source of dependency resolution or as a fallback. By default, it is considered a fallback, but setting this to true will specify it to be the source of resolution</param>
+    public GameServiceBuilder(Node rootNode, IGameServiceProvider serviceProvider, bool useAsPrimaryProvider = false)
+        : base(serviceProvider, useAsPrimaryProvider)
+    {
+        if (rootNode is null)
+        {
+            throw new ArgumentNullException(nameof(rootNode));
+        }
+
+        _rootNode = rootNode;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="GameServiceBuilder"/> using the given <see cref="Node"/> as the root for initialization and an <see cref="EmptyConfigurationProvider"/> and an optional <see cref="IGameServiceProvider"/> as an initializer
+    /// </summary>
+    /// <param name="rootNode">The node treated as the root during scene initialization</param>
+    /// <param name="configurationProvider">The configuration provider to use to retrieve the app configuration with the scene initialization</param>
+    public GameServiceBuilder(Node rootNode, IModuleConfigurationProvider configurationProvider)
+        : base(configurationProvider)
     {
         if (rootNode is null)
         {
@@ -41,8 +72,9 @@ internal class GameServiceBuilder: ModuleServiceBuilder, IGameModuleServiceBuild
     /// <param name="rootNode">The node treated as the root during scene initialization</param>
     /// <param name="configurationProvider">The configuration provider to use to retrieve the app configuration with the scene initialization</param>
     /// <param name="serviceProvider">An initializing service provider</param>
-    public GameServiceBuilder(Node rootNode, IModuleConfigurationProvider configurationProvider, IGameServiceProvider? serviceProvider = null)
-        : base(configurationProvider, serviceProvider)
+    /// <param name="useAsPrimaryProvider">Whether the provider should be considered the source of dependency resolution or as a fallback. By default, it is considered a fallback, but setting this to true will specify it to be the source of resolution</param>
+    public GameServiceBuilder(Node rootNode, IModuleConfigurationProvider configurationProvider, IGameServiceProvider serviceProvider, bool useAsPrimaryProvider = false)
+        : base(configurationProvider, serviceProvider, useAsPrimaryProvider)
     {
         if (rootNode is null)
         {

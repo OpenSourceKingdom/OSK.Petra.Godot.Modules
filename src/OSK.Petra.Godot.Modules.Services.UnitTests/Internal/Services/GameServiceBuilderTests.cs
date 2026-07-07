@@ -51,18 +51,16 @@ public class GameServiceBuilderTests
 
         rootNode.AddChild(childNode);
 
-        var services = new ServiceCollection();
-
         var mockServiceProvider = new Mock<IGameServiceProvider>();
-        mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(services);
+        mockServiceProvider.Setup(s => s.GetServiceDescriptors())
+            .Returns([]);
         var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
         builder.AddNode<TestNode>();
 
         // Assert
-        Assert.Single(services);
+        Assert.Single(builder.Services);
 
         rootNode.Free();
     }
@@ -77,18 +75,16 @@ public class GameServiceBuilderTests
 
         rootNode.AddChild(childNode);
 
-        var services = new ServiceCollection();
-
         var mockServiceProvider = new Mock<IGameServiceProvider>();
-        mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(services);
+        mockServiceProvider.Setup(s => s.GetServiceDescriptors())
+            .Returns([]);
         var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
         builder.AddNode<ITestInterface, TestNode>();
 
         // Assert
-        Assert.Single(services);
+        Assert.Single(builder.Services);
 
         rootNode.Free();
     }
@@ -104,8 +100,8 @@ public class GameServiceBuilderTests
         rootNode.AddChild(childNode);
 
         var mockServiceProvider = new Mock<IGameServiceProvider>();
-        mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(new ServiceCollection());
+        mockServiceProvider.Setup(s => s.GetServiceDescriptors())
+            .Returns([]);
         var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
@@ -127,8 +123,8 @@ public class GameServiceBuilderTests
         rootNode.AddChild(childNode);
 
         var mockServiceProvider = new Mock<IGameServiceProvider>();
-        mockServiceProvider.Setup(s => s.CreateScopedServices())
-            .Returns(new ServiceCollection());
+        mockServiceProvider.Setup(s => s.GetServiceDescriptors())
+            .Returns([]);
         var builder = new GameServiceBuilder(rootNode, mockServiceProvider.Object);
 
         // Act
