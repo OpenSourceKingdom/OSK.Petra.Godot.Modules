@@ -22,7 +22,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="OSK.Extensions.Petra.Godot.DependencyInjection" Version="0.5.0" />
-		<PackageReference Include="OSK.Petra.Modules.Services" Version="0.3.0" />
+		<PackageReference Include="OSK.Petra.Modules.Services" Version="0.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>

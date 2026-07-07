@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="OSK.Petra.Modules" Version="0.1.0" />
+	  <PackageReference Include="OSK.Petra.Modules" Version="0.5.0" />
 	</ItemGroup>
 
 </Project>

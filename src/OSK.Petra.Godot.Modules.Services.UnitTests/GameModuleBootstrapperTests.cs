@@ -30,8 +30,8 @@ public class GameModuleBootstrapperTests
             .Verifiable();
 
         _mockServiceProvider
-            .Setup(m => m.CreateScopedServices())
-            .Returns(new ServiceCollection());
+            .Setup(m => m.GetServiceDescriptors())
+            .Returns([]);
     }
 
     #endregion
